@@ -47,8 +47,7 @@ class TWOBITPREDICTOR
     };
 
     static VOID Instruction(INS ins, VOID *v);
-    static VOID CondBranch(TWOBITPREDICTOR *bm, INT8 * branchHistory, VOID * ip,  BOOL taken);
-    inline INT8 * HistAddress(INS ins);
+    static VOID CondBranch(TWOBITPREDICTOR *bm, VOID * ip,  BOOL taken);
 
     INT8 global_branchHistory;
     UINT64 _references, _predicts;
@@ -58,6 +57,7 @@ inline TWOBITPREDICTOR::TWOBITPREDICTOR()
 {
     _references = 0;
     _predicts = 0;
+    global_branchHistory = 0;
 }
 
 inline VOID TWOBITPREDICTOR::Instruction(INS ins, VOID *v)
@@ -66,19 +66,19 @@ inline VOID TWOBITPREDICTOR::Instruction(INS ins, VOID *v)
     if (INS_IsBranchOrCall(ins) && INS_HasFallThrough(ins))
         {
             INS_InsertPredicatedCall(ins, IPOINT_BEFORE, 
-                           (AFUNPTR)CondBranch, IARG_PTR, (void *)bm, IARG_PTR, (void *)&bm->global_branchHistory, IARG_INST_PTR, IARG_BRANCH_TAKEN, IARG_END);
+                           (AFUNPTR)CondBranch, IARG_PTR, (void *)bm, IARG_INST_PTR, IARG_BRANCH_TAKEN, IARG_END);
         }
 }
 
 
-inline VOID TWOBITPREDICTOR::CondBranch(TWOBITPREDICTOR *bm, INT8 * branchHistory, 
+inline VOID TWOBITPREDICTOR::CondBranch(TWOBITPREDICTOR *bm, 
 VOID * ip, BOOL taken)
 {
     INT8 history;
 
     bm->_references++;
   
-    history = *branchHistory & 0x3;
+    history = bm->global_branchHistory & 0x3;
     bm->_predicts += (taken && history >= 2);
     bm->_predicts += (!taken && history <= 1);
 
@@ -92,5 +92,5 @@ VOID * ip, BOOL taken)
         delta = -1;
     }
   
-    *branchHistory += delta;
+    bm->global_branchHistory += delta;
 }

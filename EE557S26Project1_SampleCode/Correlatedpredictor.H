@@ -62,9 +62,9 @@ inline CORRELATEDPREDICTOR::CORRELATEDPREDICTOR()
     _references = 0;
     _predicts = 0;
     _global_branchHistory = 0;
-    // for (int i = 0; i < TABLESIZE; i++)
-    //     for (int j = 0; j < BUNDLESIZE; j++)
-    //         _branchHistory[i][j] = 0;
+    for (int i = 0; i < TABLESIZE; i++)
+        for (int j = 0; j < BUNDLESIZE; j++)
+            _branchHistory[i][j] = 0;
 }
 
 inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)

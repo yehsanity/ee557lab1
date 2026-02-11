@@ -58,6 +58,8 @@ inline BIMODAL::BIMODAL()
 {
     _references = 0;
     _predicts = 0;
+    // Initialize all history entries to 0 (Strongly Not Taken) or a specific state if required
+    for (int i=0; i<TABLESIZE; i++) _branchHistory[i] = 0;
 }
 
 inline VOID BIMODAL::Instruction(INS ins, VOID *v)
