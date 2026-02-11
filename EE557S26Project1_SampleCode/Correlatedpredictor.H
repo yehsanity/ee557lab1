@@ -96,8 +96,6 @@ VOID * ip, BOOL taken)
     bm->_predicts += (taken && history >= 2);
     bm->_predicts += (!taken && history <= 1);
 
-    bm->_global_branchHistory = (bm->_global_branchHistory << 1) + taken;
-
     INT8 delta = 0;
     if (taken && history < 3)
     {
@@ -109,4 +107,6 @@ VOID * ip, BOOL taken)
     }
   
     bm->_branchHistory[bm->_global_branchHistory & 0xf][address & 0xf] += delta;
+    bm->_global_branchHistory = (bm->_global_branchHistory << 1) + taken;
+
 }
