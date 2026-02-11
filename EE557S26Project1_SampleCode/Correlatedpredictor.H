@@ -52,8 +52,8 @@ class CORRELATEDPREDICTOR
     static VOID CondBranch(CORRELATEDPREDICTOR *bm, VOID * ip,  BOOL taken);
     inline INT8 * HistAddress(INS ins);
 
-    INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
-    INT8 _global_branchHistory;
+    UINT8 _branchHistory[TABLESIZE][BUNDLESIZE];
+    UINT8 _global_branchHistory;
     UINT64 _references, _predicts;
 };
 
@@ -89,24 +89,20 @@ VOID * ip, BOOL taken)
     INT8 history;
 
     bm->_references++;
-    ADDRINT address = (ADDRINT)ip;
-    history = (bm->_branchHistory[bm->_global_branchHistory & 0xf][address & 0xf]) & 0x3;
-
-    // history = (bm->_branchHistory[bm->_global_branchHistory & 0xf][ip & 0xf]) & 0x3;
+    UINT32 ghr_index = bm->_global_branchHistory & 0xf;
+    UINT32 pc_index = ((ADDRINT)ip) & 0xf;
+    
+    history = (bm->_branchHistory[ghr_index][pc_index]) & 0x3;
     bm->_predicts += (taken && history >= 2);
     bm->_predicts += (!taken && history <= 1);
-
+    
     INT8 delta = 0;
-    if (taken && history < 3)
-    {
-        delta = 1;
-    }
-    if (!taken && history > 0)
-    {
-        delta = -1;
-    }
+    if (taken && history < 3) delta = 1;
+    if (!taken && history > 0) delta = -1;
   
-    bm->_branchHistory[bm->_global_branchHistory & 0xf][address & 0xf] += delta;
+    
+    bm->_branchHistory[ghr_index][pc_index] += delta;
+    
     bm->_global_branchHistory = (bm->_global_branchHistory << 1) + taken;
 
 }
