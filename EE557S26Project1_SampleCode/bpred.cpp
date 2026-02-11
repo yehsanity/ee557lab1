@@ -36,12 +36,15 @@ END_LEGAL */
 #include "pin.H"
 #include "bimodal.H"
 #include "alwaystaken.H"
+#include "Correlatedpredictor.H"
+#include "twobitglobalpredictor.H"
 
 using namespace std;
 
 LOCALVAR BIMODAL bimodal;
 LOCALVAR ALWAYSTAKEN alwaystaken;
-
+LOCALVAR CORRELATEDPREDICTOR Correlatedpredictor;
+LOCALVAR TWOBITPREDICTOR twobitglobalpredictor;
 ofstream OutFile;
 
 KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE, "pintool",
@@ -65,8 +68,8 @@ VOID Fini(INT32 code, VOID *v)
 
     OutFile << endl;
     OutFile << "2-bit Global Predictor" << endl;
-    OutFile << "Total Prediction: " << "[Number of prediction]" << endl;
-    OutFile << "Prediction Rate: " << "[Prediction rate]" << endl;
+    OutFile << "Total Prediction: " << (double)twobitglobalpredictor.References() << endl;
+    OutFile << "Prediction Rate: " << (double)twobitglobalpredictor.Predicts() / (double)twobitglobalpredictor.References() << endl;
 
     OutFile << endl;
     OutFile << "Bimodal Predictor" << endl;
@@ -75,8 +78,8 @@ VOID Fini(INT32 code, VOID *v)
 
     OutFile << endl;
     OutFile << "Correlated Predictor" << endl;
-    OutFile << "Total Prediction: " << "[Number of prediction]" << endl;
-    OutFile << "Prediction Rate: " << "[Prediction rate]" << endl;
+    OutFile << "Total Prediction: " << (double)Correlatedpredictor.References() << endl;
+    OutFile << "Prediction Rate: " << (double)Correlatedpredictor.Predicts() / (double)Correlatedpredictor.References() << endl;
     
     OutFile << "=============================================" << endl;
     
