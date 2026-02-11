@@ -85,8 +85,10 @@ VOID * ip, BOOL taken)
     INT8 history;
 
     bm->_references++;
-  
-    history = (bm->_branchHistory[bm->_global_branchHistory & 0xf][ip & 0xf]) & 0x3;
+    ADDRINT address = (ADDRINT)ip;
+    history = (bm->_branchHistory[bm->_global_branchHistory & 0xf][address & 0xf]) & 0x3;
+
+    // history = (bm->_branchHistory[bm->_global_branchHistory & 0xf][ip & 0xf]) & 0x3;
     bm->_predicts += (taken && history >= 2);
     bm->_predicts += (!taken && history <= 1);
 
@@ -102,5 +104,5 @@ VOID * ip, BOOL taken)
         delta = -1;
     }
   
-    bm->_branchHistory[bm->_global_branchHistory & 0xf][ip & 0xf] += delta;
+    bm->_branchHistory[bm->_global_branchHistory & 0xf][address & 0xf] += delta;
 }
