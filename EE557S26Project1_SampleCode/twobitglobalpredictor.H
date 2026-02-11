@@ -58,7 +58,6 @@ inline TWOBITPREDICTOR::TWOBITPREDICTOR()
 {
     _references = 0;
     _predicts = 0;
-    global_branchHistory = 0;
 }
 
 inline VOID TWOBITPREDICTOR::Instruction(INS ins, VOID *v)
