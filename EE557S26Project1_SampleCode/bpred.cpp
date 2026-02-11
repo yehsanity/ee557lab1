@@ -101,6 +101,8 @@ int main(int argc, char * argv[])
     
     bimodal.Activate();
     alwaystaken.Activate();
+    Correlatedpredictor.Activate();
+    twobitglobalpredictor.Activate();
 
     // Register Instruction to be called to instrument instructions
     //INS_AddInstrumentFunction(Instruction, 0);
