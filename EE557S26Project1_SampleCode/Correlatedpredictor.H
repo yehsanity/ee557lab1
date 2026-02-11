@@ -49,7 +49,7 @@ class CORRELATEDPREDICTOR
     };
 
     static VOID Instruction(INS ins, VOID *v);
-    static VOID CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory, VOID * ip,  BOOL taken);
+    static VOID CondBranch(CORRELATEDPREDICTOR *bm, VOID * ip,  BOOL taken);
     inline INT8 * HistAddress(INS ins);
 
     INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
