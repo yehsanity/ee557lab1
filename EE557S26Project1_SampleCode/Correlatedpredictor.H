@@ -52,8 +52,8 @@ class CORRELATEDPREDICTOR
     static VOID CondBranch(CORRELATEDPREDICTOR *bm, VOID * ip,  BOOL taken);
     inline INT8 * HistAddress(INS ins);
 
-    UINT8 _branchHistory[TABLESIZE][BUNDLESIZE];
-    UINT8 _global_branchHistory;
+    INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
+    INT8 _global_branchHistory;
     UINT64 _references, _predicts;
 };
 
@@ -89,8 +89,8 @@ VOID * ip, BOOL taken)
     INT8 history;
 
     bm->_references++;
-    UINT32 ghr_index = bm->_global_branchHistory & 0xf;
-    UINT32 pc_index = ((ADDRINT)ip) & 0xf;
+    UINT32 ghr_index = bm->_global_branchHistory & 0xF;
+    UINT32 pc_index = ((ADDRINT)ip) & 0xF;
     
     history = (bm->_branchHistory[ghr_index][pc_index]) & 0x3;
     bm->_predicts += (taken && history >= 2);
