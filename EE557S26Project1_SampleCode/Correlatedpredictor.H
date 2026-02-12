@@ -73,15 +73,15 @@ inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
     if (INS_IsBranchOrCall(ins) && INS_HasFallThrough(ins))
         {
             INS_InsertPredicatedCall(ins, IPOINT_BEFORE, 
-                           (AFUNPTR)CondBranch, IARG_PTR, (void *)bm, IARG_INST_PTR, IARG_BRANCH_TAKEN, IARG_END);
+                           (AFUNPTR)CondBranch, IARG_PTR, (void *)bm, IARG_INST_PTR, (void *)bm->HistAddress(ins), IARG_BRANCH_TAKEN, IARG_END);
         }
 }
 
-// inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
-// {
-//     ADDRINT ip = INS_Address(ins);
-//     return &(_branchHistory[(ip / BUNDLESIZE) % TABLESIZE][ip]);
-// }
+inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
+{
+    ADDRINT ip = INS_Address(ins);
+    return &(ip);
+}
 
 inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm,  
 VOID * ip, BOOL taken)
@@ -90,7 +90,7 @@ VOID * ip, BOOL taken)
 
     bm->_references++;
     UINT32 ghr_index = bm->_global_branchHistory & 0xF;
-    UINT32 pc_index = ((ADDRINT)ip) & 0xF;
+    UINT32 pc_index = ((INT8 *) ip) & 0xF;
     
     history = (bm->_branchHistory[ghr_index][pc_index]) & 0x3;
     bm->_predicts += (taken && history >= 2);
