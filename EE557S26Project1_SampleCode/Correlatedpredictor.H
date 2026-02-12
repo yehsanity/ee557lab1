@@ -43,14 +43,17 @@ class CORRELATEDPREDICTOR
   private:
     enum 
     {
-        TABLESIZE = 32
+        TABLESIZE = 16,
+        BUNDLESIZE = 16,
+        MAXTHREADS = 100
     };
 
     static VOID Instruction(INS ins, VOID *v);
-    static VOID CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory, VOID * ip,  BOOL taken);
+    static VOID CondBranch(CORRELATEDPREDICTOR *bm, VOID * ip,  BOOL taken);
     inline INT8 * HistAddress(INS ins);
 
-    INT8 _branchHistory[TABLESIZE];
+    INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
+    INT8 _global_branchHistory;
     UINT64 _references, _predicts;
 };
 
@@ -58,8 +61,10 @@ inline CORRELATEDPREDICTOR::CORRELATEDPREDICTOR()
 {
     _references = 0;
     _predicts = 0;
-    // Initialize all history entries to 0 (Strongly Not Taken) or a specific state if required
-    for (int i=0; i<TABLESIZE; i++) _branchHistory[i] = 0;
+    _global_branchHistory = 0;
+    for (int i = 0; i < TABLESIZE; i++)
+        for (int j = 0; j < BUNDLESIZE; j++)
+            _branchHistory[i][j] = 0;
 }
 
 inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
@@ -68,38 +73,36 @@ inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
     if (INS_IsBranchOrCall(ins) && INS_HasFallThrough(ins))
         {
             INS_InsertPredicatedCall(ins, IPOINT_BEFORE, 
-                           (AFUNPTR)CondBranch, IARG_PTR, (void *)bm, IARG_PTR, (void *)bm->HistAddress(ins), IARG_INST_PTR, IARG_BRANCH_TAKEN, IARG_END);
+                           (AFUNPTR)CondBranch, IARG_PTR, (void *)bm, IARG_INST_PTR, (void *)bm->HistAddress(ins), IARG_BRANCH_TAKEN, IARG_END);
         }
 }
 
 inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
 {
     ADDRINT ip = INS_Address(ins);
-    // Use last 5 bits of PC to index (ip & 0x1F)
-    // 0x1F is 0001 1111 in binary
-    return &(_branchHistory[ip % TABLESIZE]);
+    return &(ip);
 }
 
-inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory, 
+inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm,  
 VOID * ip, BOOL taken)
 {
     INT8 history;
 
     bm->_references++;
-  
-    history = *branchHistory & 0x3;
+    UINT32 ghr_index = bm->_global_branchHistory & 0xF;
+    UINT32 pc_index = (*ip) & 0xF;
+    
+    history = (bm->_branchHistory[ghr_index][pc_index]) & 0x3;
     bm->_predicts += (taken && history >= 2);
     bm->_predicts += (!taken && history <= 1);
-
+    
     INT8 delta = 0;
-    if (taken && history < 3)
-    {
-        delta = 1;
-    }
-    if (!taken && history > 0)
-    {
-        delta = -1;
-    }
+    if (taken && history < 3) delta = 1;
+    if (!taken && history > 0) delta = -1;
   
-    *branchHistory += delta;
+    
+    bm->_branchHistory[ghr_index][pc_index] += delta;
+    
+    bm->_global_branchHistory = (bm->_global_branchHistory << 1) + taken;
+
 }
