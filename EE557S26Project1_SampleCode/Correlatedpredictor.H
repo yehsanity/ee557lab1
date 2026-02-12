@@ -44,7 +44,7 @@ class CORRELATEDPREDICTOR
     enum 
     {
         TABLESIZE = 16,
-        BUNDLESIZE = 16,
+        BUNDLESIZE = 32,
         MAXTHREADS = 100
     };
 
