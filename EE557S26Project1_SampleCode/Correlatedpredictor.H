@@ -52,8 +52,9 @@ class CORRELATEDPREDICTOR
     static VOID CondBranch(CORRELATEDPREDICTOR *bm, VOID * ip,  BOOL taken);
     inline INT8 * HistAddress(INS ins);
 
-    INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
-    INT8 _global_branchHistory;
+    // INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
+    INT8 _branchHistory[BUNDLESIZE];
+    // INT8 _global_branchHistory;
     UINT64 _references, _predicts;
 };
 
@@ -61,10 +62,9 @@ inline CORRELATEDPREDICTOR::CORRELATEDPREDICTOR()
 {
     _references = 0;
     _predicts = 0;
-    _global_branchHistory = 0;
-    for (int i = 0; i < TABLESIZE; i++)
-        for (int j = 0; j < BUNDLESIZE; j++)
-            _branchHistory[i][j] = 0;
+    // _global_branchHistory = 0;
+    for (int j = 0; j < BUNDLESIZE; j++)
+        _branchHistory[j] = 0;
 }
 
 inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
@@ -80,7 +80,7 @@ inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
 inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
 {
     ADDRINT ip = INS_Address(ins);
-    return &(_branchHistory[_global_branchHistory % TABLESIZE][ip % BUNDLESIZE]);
+    return &(_branchHistory[ip % BUNDLESIZE]);
 }
 
 inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory,
