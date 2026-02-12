@@ -99,10 +99,10 @@ int main(int argc, char * argv[])
 
     OutFile.open(KnobOutputFile.Value().c_str());
     
+    correlatedpredictor.Activate();
     alwaystaken.Activate();
     twobitglobalpredictor.Activate();
     bimodal.Activate();
-    correlatedpredictor.Activate();
 
     // Register Instruction to be called to instrument instructions
     //INS_AddInstrumentFunction(Instruction, 0);
