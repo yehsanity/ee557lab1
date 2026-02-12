@@ -43,18 +43,14 @@ class CORRELATEDPREDICTOR
   private:
     enum 
     {
-        TABLESIZE = 16,
-        BUNDLESIZE = 32,
-        MAXTHREADS = 100
+        TABLESIZE = 32
     };
 
     static VOID Instruction(INS ins, VOID *v);
-    static VOID CondBranch(CORRELATEDPREDICTOR *bm, VOID * ip,  BOOL taken);
+    static VOID CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory, VOID * ip,  BOOL taken);
     inline INT8 * HistAddress(INS ins);
 
-    // INT8 _branchHistory[TABLESIZE][BUNDLESIZE];
-    INT8 _branchHistory[BUNDLESIZE];
-    // INT8 _global_branchHistory;
+    INT8 _branchHistory[TABLESIZE];
     UINT64 _references, _predicts;
 };
 
@@ -62,9 +58,8 @@ inline CORRELATEDPREDICTOR::CORRELATEDPREDICTOR()
 {
     _references = 0;
     _predicts = 0;
-    // _global_branchHistory = 0;
-    for (int j = 0; j < BUNDLESIZE; j++)
-        _branchHistory[j] = 0;
+    // Initialize all history entries to 0 (Strongly Not Taken) or a specific state if required
+    for (int i=0; i<TABLESIZE; i++) _branchHistory[i] = 0;
 }
 
 inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
@@ -80,27 +75,31 @@ inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
 inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
 {
     ADDRINT ip = INS_Address(ins);
-    return &(_branchHistory[ip % BUNDLESIZE]);
+    // Use last 5 bits of PC to index (ip & 0x1F)
+    // 0x1F is 0001 1111 in binary
+    return &(_branchHistory[ip % TABLESIZE]);
 }
 
-inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory,
+inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm, INT8 * branchHistory, 
 VOID * ip, BOOL taken)
 {
     INT8 history;
 
     bm->_references++;
-    
-    history = (*branchHistory) & 0x3;
+  
+    history = *branchHistory & 0x3;
     bm->_predicts += (taken && history >= 2);
     bm->_predicts += (!taken && history <= 1);
-    
-    INT8 delta = 0;
-    if (taken && history < 3) delta = 1;
-    if (!taken && history > 0) delta = -1;
-  
-    
-    (*branchHistory) += delta;
-    
-    bm->_global_branchHistory = (bm->_global_branchHistory << 1) | taken;
 
+    INT8 delta = 0;
+    if (taken && history < 3)
+    {
+        delta = 1;
+    }
+    if (!taken && history > 0)
+    {
+        delta = -1;
+    }
+  
+    *branchHistory += delta;
 }
