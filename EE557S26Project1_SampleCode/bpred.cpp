@@ -36,14 +36,14 @@ END_LEGAL */
 #include "pin.H"
 #include "bimodal.H"
 #include "alwaystaken.H"
-#include "Correlatedpredictor.H"
+#include "correlatedpredictor.H"
 #include "twobitglobalpredictor.H"
 
 using namespace std;
 
 LOCALVAR BIMODAL bimodal;
 LOCALVAR ALWAYSTAKEN alwaystaken;
-LOCALVAR CORRELATEDPREDICTOR Correlatedpredictor;
+LOCALVAR cORRELATEDPREDICTOR correlatedpredictor;
 LOCALVAR TWOBITPREDICTOR twobitglobalpredictor;
 ofstream OutFile;
 
@@ -78,8 +78,8 @@ VOID Fini(INT32 code, VOID *v)
 
     OutFile << endl;
     OutFile << "Correlated Predictor" << endl;
-    OutFile << "Total Prediction: " << (double)Correlatedpredictor.References() << endl;
-    OutFile << "Prediction Rate: " << (double)Correlatedpredictor.Predicts() / (double)Correlatedpredictor.References() << endl;
+    OutFile << "Total Prediction: " << (double)correlatedpredictor.References() << endl;
+    OutFile << "Prediction Rate: " << (double)correlatedpredictor.Predicts() / (double)correlatedpredictor.References() << endl;
     
     OutFile << "=============================================" << endl;
     
@@ -102,7 +102,7 @@ int main(int argc, char * argv[])
     alwaystaken.Activate();
     twobitglobalpredictor.Activate();
     bimodal.Activate();
-    Correlatedpredictor.Activate();
+    correlatedpredictor.Activate();
 
     // Register Instruction to be called to instrument instructions
     //INS_AddInstrumentFunction(Instruction, 0);
