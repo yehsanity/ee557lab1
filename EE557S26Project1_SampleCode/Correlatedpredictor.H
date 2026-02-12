@@ -77,11 +77,11 @@ inline VOID CORRELATEDPREDICTOR::Instruction(INS ins, VOID *v)
         }
 }
 
-inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
-{
-    ADDRINT ip = INS_Address(ins);
-    return &(ip);
-}
+// inline INT8 * CORRELATEDPREDICTOR::HistAddress(INS ins)
+// {
+//     ADDRINT ip = INS_Address(ins);
+//     return &(ip);
+// }
 
 inline VOID CORRELATEDPREDICTOR::CondBranch(CORRELATEDPREDICTOR *bm,  
 VOID * ip, BOOL taken)
