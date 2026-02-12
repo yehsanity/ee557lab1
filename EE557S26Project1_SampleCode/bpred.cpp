@@ -43,7 +43,7 @@ using namespace std;
 
 LOCALVAR BIMODAL bimodal;
 LOCALVAR ALWAYSTAKEN alwaystaken;
-LOCALVAR cORRELATEDPREDICTOR correlatedpredictor;
+LOCALVAR CORRELATEDPREDICTOR correlatedpredictor;
 LOCALVAR TWOBITPREDICTOR twobitglobalpredictor;
 ofstream OutFile;
 
