@@ -36,7 +36,7 @@ END_LEGAL */
 #include "pin.H"
 #include "bimodal.H"
 #include "alwaystaken.H"
-#include "correlatedpredictor.H"
+#include "Correlatedpredictor.H"
 #include "twobitglobalpredictor.H"
 
 using namespace std;
