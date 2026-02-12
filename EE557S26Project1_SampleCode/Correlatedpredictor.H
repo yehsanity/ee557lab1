@@ -90,7 +90,7 @@ VOID * ip, BOOL taken)
 
     bm->_references++;
     UINT32 ghr_index = bm->_global_branchHistory & 0xF;
-    UINT32 pc_index = ((INT8 *) ip) & 0xF;
+    UINT32 pc_index = (*ip) & 0xF;
     
     history = (bm->_branchHistory[ghr_index][pc_index]) & 0x3;
     bm->_predicts += (taken && history >= 2);
